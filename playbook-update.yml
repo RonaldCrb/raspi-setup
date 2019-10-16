@@ -1,0 +1,40 @@
+---
+- hosts: raspi
+  remote_user: USERNAME
+  become: yes
+  tasks:
+    - name: Ping testing connection
+      command: date
+  
+    - name: Copy a "sudoers" file on the remote 
+      copy:
+        src: files/.bashrc
+        dest: /etc/sudoers.edit
+
+    - name: Update packages
+      apt:
+        update_cache: yes
+    
+    - name: Add a list of software on raspi
+      apt:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - nmap
+          - curl
+          - htop
+          - pwgen
+          - terminator    
+          - grep
+          - git-core
+          # add packages here.
+
+    - name: Update packages for the second time
+      apt:
+        update_cache: yes
+
+    - name: Copy .bashrc config
+      copy:
+        src: .bashrc
+        dest: ~/

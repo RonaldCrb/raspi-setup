@@ -1,0 +1,39 @@
+---
+# ansible-playbook <playbook.yml> 
+#                  -i <inventory.ini> 
+#                  --vault-password-file <vault.yml>
+- hosts: raspi
+  remote_user: pi
+  become: yes
+  tasks:
+    - name: Ping testing connection
+      command: date
+              
+    - name: Update packages
+      apt:
+        update_cache: yes
+
+    - name: Add a list of software on raspi
+      apt:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - nmap
+          - curl
+          - htop
+          - pwgen
+          - terminator
+          - vim  
+    
+    - name: Update packages for the second time
+      apt:
+        update_cache: yes
+
+    - name: shutdown and restart servers
+      reboot:
+
+    - name: Wait 600 seconds for target connection to become reachable/usable
+      wait_for_connection:
+        delay: "120"
+        timeout: "600"
